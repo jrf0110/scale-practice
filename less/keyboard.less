@@ -10,6 +10,12 @@
   display: table;
   width: 100%;
   height: 300px;
+
+  @media ( max-width: 400px ){
+    & {
+      height: 150px;
+    }
+  }
 }
 
 .keyboard .white-keys,
@@ -17,6 +23,8 @@
   position: absolute;
   top: 0;
   left: 0;
+  display: -webkit-box;
+  display: -moz-box;
   display: -webkit-flex;
   display: -moz-flex;
   display: -ie-flex;
@@ -41,6 +49,8 @@
 .keyboard .keyboard-key {
   @border-radius: 3px;
 
+  -webkit-box-flex: 1;
+  -mox-box-flex: 1;
   -webkit-flex: 1 1 auto;
   -moz-flex: 1 1 auto;
   -ie-flex: 1 1 auto;
