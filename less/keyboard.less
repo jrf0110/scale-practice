@@ -1,0 +1,103 @@
+//////////////
+// Keyboard //
+//////////////
+
+@key-color: #fff;
+@black-key-color: #222;
+@key-active-color: #F7E588;
+
+.keyboard {
+  display: table;
+  width: 100%;
+  height: 300px;
+}
+
+.keyboard .white-keys,
+.keyboard .black-keys {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ie-flex;
+  display: -o-flex;
+  display: flex;
+
+  -webkit-flex-direction: row;
+  -moz-flex-direction: row;
+  -ie-flex-direction: row;
+  -o-flex-direction: row;
+  flex-direction: row;
+
+  width: 100%;
+  height: 100%;
+}
+
+.keyboard .black-keys {
+  z-index: 2;
+  height: 60%;
+}
+
+.keyboard .keyboard-key {
+  @border-radius: 3px;
+
+  -webkit-flex: 1 1 auto;
+  -moz-flex: 1 1 auto;
+  -ie-flex: 1 1 auto;
+  -o-flex: 1 1 auto;
+  flex: 1 1 auto;
+
+  height: 100%;
+
+  border-left-width: 0;
+  border-bottom-left-radius: @border-radius;
+  border-bottom-right-radius: @border-radius;
+
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+.keyboard .keyboard-key.active,
+.keyboard .keyboard-key:active {
+  background: @key-active-color !important;
+}
+
+.keyboard .white-keys .keyboard-key {
+  background: @key-color;
+  border: solid 1px rgba( 0, 0, 0, 0.1 );
+
+  &:hover {
+    background: darken( @key-color, 8% );
+  }
+}
+
+.keyboard .white-keys .keyboard-key:first-child {
+  border-left-width: 1;
+}
+
+.keyboard .black-keys .keyboard-key {
+  background: @black-key-color;
+  border: solid 1px rgba( 0, 0, 0, 0.1 );
+  margin: 0 1.2%;
+
+  &:hover {
+    background: lighten( @black-key-color, 8% );
+  }
+}
+
+.keyboard-key.keyboard-key-black:nth-child(5n - 4) {
+  margin-left: 3%;
+}
+
+.keyboard-key.keyboard-key-black:nth-child(5n - 3) {
+  margin-right: 4%;
+  margin-left: -0.08%;
+}
+
+.keyboard-key.keyboard-key-black:nth-child(5n - 2) {
+  margin-left: 2%;
+}
+
+.keyboard-key.keyboard-key-black:nth-child(5n) {
+  margin-right: 2%;
+}

@@ -1,0 +1,62 @@
+//////////
+// Core //
+//////////
+
+// Third party
+@import (less) "../bower_components/normalize-css/normalize.css";
+@import (less) "../bower_components/font-awesome/less/font-awesome.less";
+@import "../bower_components/less-elements/elements.less";
+@import (less) url(http://fonts.googleapis.com/css?family=Roboto+Slab:400,300,100,700|Roboto:400,100,300,700,900,100italic,900italic,700italic,500italic,400italic,300italic,500);
+
+@import "variables.less";
+@import "mixins.less";
+
+// Components
+@import "keyboard.less";
+
+html, body {
+  background-color:     @body-bg-color;
+  font-family:          @font-family-base;
+  font-size:            @font-size-base;
+  font-weight:          @font-weight-base;
+  line-height:          @line-height-base;
+  color:                @color-base;
+  letter-spacing:       @letter-spacing-base;
+}
+
+* {
+  position: relative;
+  .box-sizing( border-box );
+}
+
+a, span {
+  position: static;
+}
+
+a {
+  text-decoration: none;
+  color: darken( @brand-primary, 20% );
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+img {
+  max-width: 100%;
+}
+
+code {
+  display: block;
+  width: 100%;
+  padding: 10px 12px !important;
+  text-shadow: none;
+  overflow: scroll;
+}
+
+.container {
+  #grid > .container();
+}
+
+.row {
+  #grid > .row();
+}

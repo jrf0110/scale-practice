@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="/css/core.gen.css">
+
+    <script src="/bower_components/jquery/jquery.js"></script>
+    <script src="/bower_components/async/lib/async.js"></script>
+    <script src="/bower_components/sugar/release/sugar-full.development.js"></script>
+    <script src="/bower_components/audiosynth/audiosynth.js"></script>
+    <script>
+      var config = {
+        settings: {
+          instruments: [
+            { name: 'Guitar', id: 'acoustic' }
+          , { name: 'Piano', id: 'piano' }
+          ]
+
+        , keys: [
+            { name: 'C', id: 'C' }
+          , { name: 'C#', id: 'C#' }
+          , { name: 'D', id: 'D' }
+          , { name: 'E&#x266d;', id: 'D#' }
+          , { name: 'E', id: 'E' }
+          , { name: 'F', id: 'F' }
+          , { name: 'F#', id: 'F#' }
+          , { name: 'G', id: 'G' }
+          , { name: 'G#', id: 'G#' }
+          , { name: 'A', id: 'A' }
+          , { name: 'B&#x266d;', id: 'A#' }
+          , { name: 'B', id: 'B' }
+          ]
+
+        , exercises: [
+            {
+              name: 'The Major Scale (Single Octave)'
+            , id: 'major-one-octave'
+            , definition: [
+                0, 2, 4, 5, 7, 9, 11, 12
+              , 11, 9, 7, 5, 4, 2, 0
+              ]
+            }
+          , {
+              name: 'The Minor Scale (Single Octave)'
+            , id: 'minor-one-octave'
+            , definition: [
+                0, 2, 3, 5, 7, 8, 10, 12
+              , 10, 8, 7, 5, 3, 2, 0
+              ]
+            }
+          , {
+              name: 'Alternate 1 Minor'
+            , id: 'alternate-1-minor'
+            , definition: [
+                0, 2, 3
+              , 10, 12
+              , 5, 7, 8
+              , 14, 15, 17
+              , 10, 12
+              , 19, 20, 22
+              , 14, 15, 17
+              , 24, 26, 27
+              ]
+            }
+          ]
+
+        , tempo: 120
+        , octave: 1
+        }
+      , noteDuration: 2
+      };
+
+      // Reversable exercises
+      [
+        'alternate-1-minor'
+      ].forEach( function( reversable ){
+        var exercise = config.settings.exercises.find( function( ex ){
+          return ex.id === reversable;
+        });
+
+        config.settings.exercises.push({
+          name:       exercise.name + ' Reversed'
+        , id:         exercise.id + '-reversed'
+        , definition: exercise.definition.slice(0).reverse()
+        });
+      });
+
+      var app_state = {
+        instrument: 'piano'
+      , key: 'C'
+      , exercise: 'major-one-octave'
+      , tempo: config.settings.tempo
+      , octave: config.settings.octave
+      };
+
+      $.fn.instrument = function( options ){
+        var $this = this;
+
+        var defaults = {
+          keyboardNumOctaves: 3
+        , guitarNumFrets: 16
+        , keyboardTemplate: function( keys ){
+            return [
+              '<div class="keyboard">'
+            , '  <div class="black-keys">'
+            ,    keys.black
+            , '  </div>'
+            , '  <div class="white-keys">'
+            ,    keys.white
+            , '  </div>'
+            , '</div>'
+            ].join('');
+          }
+        , keyboardKeyTemplate: function( key ){
+            return [
+              '<div class="note keyboard-key'
+            , ( key.note.length > 1 ? ' keyboard-key-black' : '' )
+            , ( key.note.active ? ' active' : '' )
+            , '"'
+            , ' data-note="', key.note, '"'
+            , ' data-octave="', key.octave, '"'
+            , '></div>'
+            ].join('');
+          }
+        };
+
+        options = $.extend( {}, defaults, options );
+
+        var plugin = {
+          render: function(){
+            if ( app_state.instrument === 'piano' ){
+              var i = 0, keys = { white: '', black: '' };
+              while ( i++ < options.keyboardNumOctaves ){
+                keys.black += config.settings.keys.filter( function( key ){
+                  return key.id.length > 1;
+                }).map( function( key ){
+                  return options.keyboardKeyTemplate({ note: key.id, octave: i });
+                }).join('\n');
+
+                keys.white += config.settings.keys.filter( function( key ){
+                  return key.id.length === 1;
+                }).map( function( key ){
+                  return options.keyboardKeyTemplate({ note: key.id, octave: i });
+                }).join('\n');
+              }
+              $this.html( options.keyboardTemplate( keys ) )
+            }
+          }
+
+        , highlightNotes: function( notes ){
+            plugin.clearHighlight();
+            $this.find(
+              notes.map( function( note ){
+                return '[data-note="' + note.id + '"][data-octave="' + note.octave + '"]';
+              }).join(', ')
+            ).addClass('active');
+          }
+
+        , clearHighlight: function(){
+            $this.find('.note.active').removeClass('active');
+          }
+        };
+
+        plugin.render();
+
+        return plugin;
+      };
+
+      $.fn.app_settings = function( options ){
+        var $this = this;
+
+        var defaults = {
+          optionTmpl: function( option ){
+            return [
+              '<option value="'
+            , option.id
+            , '"'
+            , option.selected ? ' selected="true"' : ''
+            , '>'
+            , option.name
+            , '</option>'
+            ].join('');
+          }
+        , selects: [
+            { name: 'instrument', settings_key: 'instruments' }
+          , { name: 'key',        settings_key: 'keys' }
+          , { name: 'exercise',   settings_key: 'exercises' }
+          ]
+        , onInstrumentChange: function( instrument, e ){}
+        , onKeyChange:        function( key, e ){}
+        , onExerciseChange:   function( exercise, e ){}
+        , onTempoChange:      function( tempo, e ){}
+        , onPlay:             function(){}
+        };
+
+        options = $.extend( {}, defaults, options );
+
+        var plugin = {
+          render: function(){
+            options.selects.forEach( function( setting ){
+              $this.find('[name="' + setting.name + '"]').html(
+                config.settings[ setting.settings_key ].map( function( i ){
+                  if ( i.id === app_state[ setting.name ] ) i.selected = true;
+                  return i;
+                }).map( options.optionTmpl )
+              ).on( 'change', function( e ){
+                options[
+                  [
+                    'on'
+                  , setting.name[0].toUpperCase() + setting.name.slice(1)
+                  , 'Change'
+                  ].join('')
+                ]( e.target.value, e );
+              });
+            });
+
+            $this.find('[name="tempo"]').val(
+              app_state.tempo
+            ).blur( function( e ){
+              options.onTempoChange( +e.target.value, e );
+            });
+
+            $this.find('[name="play"]').click( options.onPlay );
+          }
+        };
+
+        plugin.render();
+
+        return plugin;
+      };
+
+      var instrument = Synth.createInstrument( app_state.instrument );
+
+      $(function(){
+        var playExercise = function( key, exercise, callback ){
+          callback = callback || function(){};
+
+          var durationSec = app_state.tempo / 60 / 4;
+          var durationMicro = durationSec * 1000;
+          var keyStart = config.settings.keys.findIndex( function( k ){
+            return k.id === key;
+          });
+
+          return async.series(
+            exercise.definition.map( function( note ){
+              return function( next ){
+                var noteId = config.settings.keys[ ( keyStart + note ) % ( config.settings.keys.length  ) ].id;
+
+                var octave = app_state.octave + Math.floor(( keyStart + note ) / ( config.settings.keys.length ));
+
+                instrument.play( noteId, octave, durationSec );
+
+                instrumentView.highlightNotes([ { id: noteId, octave: octave } ]);
+
+                setTimeout( next, durationMicro );
+              };
+            })
+          , function(){
+              instrumentView.clearHighlight();
+              callback();
+            }
+          );
+        };
+
+        $('.app-settings').app_settings({
+          onInstrumentChange: function( id ){
+            if ( app_state.instrument === id ) return;
+
+            app_state.instrument = id;
+            instrument = Synth.createInstrument( app_state.instrument );
+            instrumentView.render();
+          }
+
+        , onKeyChange: function( key ){
+            app_state.key = key;
+          }
+
+        , onTempoChange: function( tempo ){
+            app_state.tempo = tempo;
+          }
+
+        , onExerciseChange: function( exercise ){
+            app_state.exercise = exercise;
+          }
+
+        , onPlay: function(){
+            playExercise( app_state.key, config.settings.exercises.find( function( e ){
+              return e.id === app_state.exercise;
+            }));
+          }
+        });
+
+        var instrumentView = $('.instrument').instrument({
+          onNoteClick: function( note, e ){
+            instrument.play( note.id, note.octave, config.noteDuration );
+          }
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div class="app-settings">
+      <select name="instrument" class="setting-control"></select>
+      <select name="key" class="setting-control"></select>
+      <select name="exercise" class="setting-control"></select>
+      <input  name="tempo" type="number">
+      <button name="play">Play</button>
+    </div>
+    <div class="instrument"></div>
+  </body>
+</html>
