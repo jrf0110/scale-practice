@@ -234,7 +234,7 @@
         var playExercise = function( key, exercise, callback ){
           callback = callback || function(){};
 
-          var durationSec = app_state.tempo / 60 / 4;
+          var durationSec = 1 / (app_state.tempo / 60);
           var durationMicro = durationSec * 1000;
           var keyStart = config.settings.keys.findIndex( function( k ){
             return k.id === key;
