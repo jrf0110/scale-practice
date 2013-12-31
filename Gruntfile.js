@@ -1,7 +1,7 @@
 var fs = require('fs');
 var async = require('async');
-var wrench = {};//require('wrench');
-var jsdom = {};//require('jsdom');
+var wrench = require('wrench');
+var jsdom = require('jsdom');
 var childProcess = require('child_process');
 
 module.exports = function( grunt ){
