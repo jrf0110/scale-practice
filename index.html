@@ -8,31 +8,6 @@
     <script src="/bower_components/sugar/release/sugar-full.development.js"></script>
     <script src="/bower_components/audiosynth/audiosynth.js"></script>
     <script>
-      function createAudioContext(callback, errback) {
-        var ac = new webkitAudioContext();
-        ac.createGainNode(); // .. and discard it. This gets 
-                             // the clock running at some point.
-
-        var count = 0;
-
-        function wait() {
-            if (ac.currentTime === 0) {
-                // Not ready yet.
-                ++count;
-                if (count > 600) {
-                    errback('timeout');
-                } else {
-                    setTimeout(wait, 100);
-                }
-            } else {
-                // Ready. Pass on the valid audio context.
-                callback(ac); 
-            }
-        }
-
-        wait();
-      };
-
       var config = {
         settings: {
           instruments: [
@@ -91,6 +66,7 @@
         , tempo: 120
         , octave: 3
         }
+
       , noteDuration: 2
       , noteMin: 1
       };
@@ -124,6 +100,7 @@
         var defaults = {
           keyboardNumOctaves: 3
         , guitarNumFrets: 16
+        , guitarNumStrings: 6
         , onNoteClick: function( note, e ){}
         , keyboardTemplate: function( keys ){
             return [
@@ -148,6 +125,31 @@
             , '></div>'
             ].join('');
           }
+
+        , guitarTemplate: function( options ){
+            return [
+              '<div class="guitar">'
+            , '  <div class="strings">'
+            ,    options.strings
+            , '  </div>'
+            , '  <div class="fretboard">'
+            ,    options.frets
+            , '  </div>'
+            , '</div>'
+            ].join('');
+          }
+
+        , guitarStringTemplate: function(){
+            return [
+              '<div class="string"></div>'
+            ].join('');
+          }
+
+        , guitarFretTemplate: function(){
+            return [
+              '<div class="fret"></div>'
+            ].join('');
+          }
         };
 
         options = $.extend( {}, defaults, options );
@@ -155,28 +157,49 @@
         var plugin = {
           render: function(){
             if ( app_state.instrument === 'piano' ){
-              var keys = { white: '', black: '' };
-                for ( var i = 0; i < options.keyboardNumOctaves; i++ ){
-                keys.black += config.settings.keys.filter( function( key ){
-                  return key.id.length > 1;
-                }).map( function( key ){
-                  return options.keyboardKeyTemplate({ note: key.id, octave: i });
-                }).join('\n');
-
-                keys.white += config.settings.keys.filter( function( key ){
-                  return key.id.length === 1;
-                }).map( function( key ){
-                  return options.keyboardKeyTemplate({ note: key.id, octave: i });
-                }).join('\n');
-              }
-
-              $this.html( options.keyboardTemplate( keys ) );
-
-              $this.find('.note').on( 'mousedown', function( e ){
-                var $el = $( e.target );
-                options.onNotePress( { id: $el.data('note'), octave: $el.data('octave') }, e );
-              });
+              plugin.renderPiano();
+            } else if ( app_state.instrument === 'acoustic' ){
+              plugin.renderGuitar();
             }
+          }
+
+        , renderPiano: function(){
+            var keys = { white: '', black: '' };
+            for ( var i = 0; i < options.keyboardNumOctaves; i++ ){
+              keys.black += config.settings.keys.filter( function( key ){
+                return key.id.length > 1;
+              }).map( function( key ){
+                return options.keyboardKeyTemplate({ note: key.id, octave: i });
+              }).join('\n');
+
+              keys.white += config.settings.keys.filter( function( key ){
+                return key.id.length === 1;
+              }).map( function( key ){
+                return options.keyboardKeyTemplate({ note: key.id, octave: i });
+              }).join('\n');
+            }
+
+            $this.html( options.keyboardTemplate( keys ) );
+
+            $this.find('.note').on( 'mousedown', function( e ){
+              var $el = $( e.target );
+              options.onNotePress( { id: $el.data('note'), octave: $el.data('octave') }, e );
+            });
+          }
+
+        , renderGuitar: function(){
+            var guitar = { strings: '', frets: '' };
+            var i;
+
+            for ( i = 0; i < options.guitarNumStrings; i++ ){
+              guitar.strings += options.guitarStringTemplate();
+            }
+
+            for ( i = 0; i < options.guitarNumFrets; i++ ){
+              guitar.frets += options.guitarFretTemplate();
+            }
+
+            $this.html( options.guitarTemplate( guitar ) );
           }
 
         , highlightNotes: function( notes ){
@@ -345,25 +368,5 @@
       <button name="play">Play</button>
     </div>
     <div class="instrument"></div>
-    <div class="guitar">
-      <div class="fretboard">
-        <div class="fret"></div>
-        <div class="fret"></div>
-        <div class="fret"></div>
-        <div class="fret"></div>
-        <div class="fret"></div>
-        <div class="fret"></div>
-        <div class="fret"></div>
-        <div class="fret"></div>
-        <div class="fret"></div>
-        <div class="fret"></div>
-        <div class="fret"></div>
-        <div class="fret"></div>
-        <div class="fret"></div>
-        <div class="fret"></div>
-        <div class="fret"></div>
-        <div class="fret"></div>
-      </div>
-    </div>
   </body>
 </html>
