@@ -326,7 +326,11 @@
 
         var instrumentView = $('.instrument').instrument({
           onNotePress: function( note, e ){
-            instrument.play( note.id, app_state.octave + note.octave, config.noteDuration );
+            instrument.play(
+              note.id
+            , app_state.octave + note.octave
+            , config.noteDuration
+            );
           }
         });
       });
@@ -341,5 +345,25 @@
       <button name="play">Play</button>
     </div>
     <div class="instrument"></div>
+    <div class="guitar">
+      <div class="fretboard">
+        <div class="fret"></div>
+        <div class="fret"></div>
+        <div class="fret"></div>
+        <div class="fret"></div>
+        <div class="fret"></div>
+        <div class="fret"></div>
+        <div class="fret"></div>
+        <div class="fret"></div>
+        <div class="fret"></div>
+        <div class="fret"></div>
+        <div class="fret"></div>
+        <div class="fret"></div>
+        <div class="fret"></div>
+        <div class="fret"></div>
+        <div class="fret"></div>
+        <div class="fret"></div>
+      </div>
+    </div>
   </body>
 </html>

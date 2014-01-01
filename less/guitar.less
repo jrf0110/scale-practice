@@ -1,0 +1,50 @@
+////////////
+// Guitar //
+////////////
+
+@fretboard-color: #333;
+@fret-color: #f1f1f1;
+@neck-height: 200px;
+
+.fret( @i ) when( @i = 24 ){}
+
+.fret( @i ) when( @i < 24 ){
+  & + .fret {
+    flex: ( (-1/24 * @i) + 1 ) 1 auto;
+    .fret( @i + 1 );
+  }
+}
+
+.guitar .fretboard {
+  display: flex;
+  width: 100%;
+  height: @neck-height;
+  background: @fretboard-color;
+  border-top: solid #5F3F1B 1px;
+  border-bottom: solid #5F3F1B 1px;
+
+  @media ( max-width: 400px ){
+    & {
+      height: @neck-height / 2;
+    }
+  }
+}
+
+.fretboard > .fret {
+  flex: 1 1 auto;
+  border-top: solid 5px #FFF;
+  border-left: solid 2px @fret-color;
+
+  @media ( max-width: 400px ){
+    & {
+      border-left-width: 1px;
+      border-top-width: 3px;
+    }
+  }
+}
+
+
+.fretboard > .fret:first-child {
+  border-left-color: #fff;
+  .fret( 1 );
+}
