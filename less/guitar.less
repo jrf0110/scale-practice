@@ -42,6 +42,12 @@
 
 .guitar {
   height: @neck-height;
+
+  @media ( max-width: 400px ){
+    & {
+      height: @neck-height / 2;
+    }
+  }
 }
 
 .guitar .strings {
@@ -87,12 +93,6 @@
   background: @fretboard-color;
   border-top: solid #5F3F1B 1px;
   border-bottom: solid #5F3F1B 1px;
-
-  @media ( max-width: 400px ){
-    & {
-      height: @neck-height / 2;
-    }
-  }
 }
 
 .fretboard > .fret {
