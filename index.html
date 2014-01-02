@@ -69,6 +69,15 @@
 
       , noteDuration: 2
       , noteMin: 1
+
+      , guitarStrings: [
+          { id: 'E', octave: 2 }
+        , { id: 'A', octave: 2 }
+        , { id: 'D', octave: 3 }
+        , { id: 'G', octave: 3 }
+        , { id: 'B', octave: 3 }
+        , { id: 'E', octave: 4 }
+        ]
       };
 
       // Reversable exercises
@@ -87,7 +96,7 @@
       });
 
       var app_state = {
-        instrument: 'piano'
+        instrument: 'acoustic'
       , key: 'C'
       , exercise: 'major-one-octave'
       , tempo: config.settings.tempo
@@ -129,6 +138,9 @@
         , guitarTemplate: function( options ){
             return [
               '<div class="guitar">'
+            , '  <div class="notes">'
+            ,    options.notes
+            , '  </div>'
             , '  <div class="strings">'
             ,    options.strings
             , '  </div>'
@@ -150,6 +162,23 @@
               '<div class="fret"></div>'
             ].join('');
           }
+
+        , guitarNoteStringTemplate: function( frets ){
+            return [
+              '<div class="string">'
+            , frets
+            , '</div>'
+            ].join('');
+          }
+
+        , guitarNoteFretTemplate: function( key ){
+            return [
+              '<div class="note fret"'
+            , ' data-note="', key.note, '"'
+            , ' data-octave="', key.octave, '"'
+            , '></div>'
+            ].join('');
+          }
         };
 
         options = $.extend( {}, defaults, options );
@@ -161,6 +190,20 @@
             } else if ( app_state.instrument === 'acoustic' ){
               plugin.renderGuitar();
             }
+
+            $this.find('.note').on( 'mousedown', function( e ){
+              var $el = $( e.target );
+              options.onNotePress(
+                {
+                  id: $el.data('note')
+                , octave: $el.data('octave') + (
+                            app_state.instrument === 'piano'
+                              ? app_state.octave : 0
+                          )
+                }
+              , e
+              );
+            });
           }
 
         , renderPiano: function(){
@@ -180,16 +223,30 @@
             }
 
             $this.html( options.keyboardTemplate( keys ) );
-
-            $this.find('.note').on( 'mousedown', function( e ){
-              var $el = $( e.target );
-              options.onNotePress( { id: $el.data('note'), octave: $el.data('octave') }, e );
-            });
           }
 
         , renderGuitar: function(){
-            var guitar = { strings: '', frets: '' };
-            var i;
+            var guitar = { strings: '', frets: '', notes: '' };
+            var i, ii, frets, noteIndex, string;
+
+            for ( i = 0; i < options.guitarNumStrings; i++ ){
+              frets = "";
+              string = config.guitarStrings[ i ];
+              noteIndex = config.settings.keys.findIndex( function( key ){
+                return key.id === string.id;
+              });
+
+              for ( ii = 0; ii < options.guitarNumFrets; ii++ ){
+                frets += options.guitarNoteFretTemplate({
+                  octave: string.octave + Math.floor( ( noteIndex + 1 + ii ) / (config.settings.keys.length ) )
+                , note: config.settings.keys[
+                    ( noteIndex + 1 + ii ) % config.settings.keys.length
+                  ].id
+                });
+              }
+
+              guitar.notes += options.guitarNoteStringTemplate( frets );
+            }
 
             for ( i = 0; i < options.guitarNumStrings; i++ ){
               guitar.strings += options.guitarStringTemplate();
@@ -351,7 +408,7 @@
           onNotePress: function( note, e ){
             instrument.play(
               note.id
-            , app_state.octave + note.octave
+            , note.octave
             , config.noteDuration
             );
           }

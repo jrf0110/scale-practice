@@ -4,11 +4,12 @@
 
 @fretboard-color: #333;
 @fret-color: #f1f1f1;
+@fret-size: 4px;
 @neck-height: 200px;
 @dot-color: #fff;
 @dot-size: 14px;
 @dot-offset: 30px;
-@string-color: #FCF6D7;
+@string-color: #eee;
 @string-max-size: 5px;
 
 .fret( @i ) when( @i = 24 ){}
@@ -30,6 +31,13 @@
   height: @dot-size;
   border-radius: 2 * @dot-size;
   background: @dot-color;
+
+  media ( max-width: 400px ){
+    & {
+      width: @dot-size / 2;
+      height: @dot-size / 2;
+    }
+  }
 }
 
 .string( @i ) when ( @i = 6 ){}
@@ -50,32 +58,53 @@
   }
 }
 
-.guitar .strings {
-  display: flex;
-  flex-direction: column;
+.guitar .notes,
+.guitar .strings,
+.guitar .fretboard {
   position: absolute;
-  z-index: 2;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
 }
 
+.guitar .notes {
+  display: flex;
+  flex-direction: column;
+  z-index: 3;
+}
+
+.notes > .string {
+  display: flex;
+  height: @string-max-size;
+  margin: auto 0;
+}
+
+.notes > .string > .fret {
+  height: 100%;
+  padding: 5px 0;
+  cursor: pointer;
+  border-left: solid rgba(0, 0, 0, 0) @fret-size;
+}
+
+.notes > .string > .fret:first-child {
+  flex: 1 1 auto;
+  .fret( 1 );
+}
+
+.guitar .strings {
+  display: flex;
+  flex-direction: column;
+  z-index: 2;
+}
+
 .strings > .string {
   width: 100%;
   margin: auto 0;
-  // background: @string-color;
+  background: @string-color;
   opacity: 0.99;
   border: dotted 1px rgba( 0, 0, 0, 0.12 );
   box-shadow: 0 1px 1px rgba( 0, 0, 0, 0.5 );
-  background: rgb(246,248,249); /* Old browsers */
-  background: -moz-linear-gradient(top,  rgba(246,248,249,1) 0%, rgba(229,235,238,1) 50%, rgba(215,222,227,1) 51%, rgba(245,247,249,1) 100%); /* FF3.6+ */
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(246,248,249,1)), color-stop(50%,rgba(229,235,238,1)), color-stop(51%,rgba(215,222,227,1)), color-stop(100%,rgba(245,247,249,1))); /* Chrome,Safari4+ */
-  background: -webkit-linear-gradient(top,  rgba(246,248,249,1) 0%,rgba(229,235,238,1) 50%,rgba(215,222,227,1) 51%,rgba(245,247,249,1) 100%); /* Chrome10+,Safari5.1+ */
-  background: -o-linear-gradient(top,  rgba(246,248,249,1) 0%,rgba(229,235,238,1) 50%,rgba(215,222,227,1) 51%,rgba(245,247,249,1) 100%); /* Opera 11.10+ */
-  background: -ms-linear-gradient(top,  rgba(246,248,249,1) 0%,rgba(229,235,238,1) 50%,rgba(215,222,227,1) 51%,rgba(245,247,249,1) 100%); /* IE10+ */
-  background: linear-gradient(to bottom,  rgba(246,248,249,1) 0%,rgba(229,235,238,1) 50%,rgba(215,222,227,1) 51%,rgba(245,247,249,1) 100%); /* W3C */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f6f8f9', endColorstr='#f5f7f9',GradientType=0 ); /* IE6-9 */
 }
 
 .strings > .string:first-child {
@@ -85,11 +114,6 @@
 
 .guitar .fretboard {
   display: flex;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
   background: @fretboard-color;
   border-top: solid #5F3F1B 1px;
   border-bottom: solid #5F3F1B 1px;
@@ -99,11 +123,11 @@
   flex: 1 1 auto;
   border-top: solid 5px #FFF;
   border-bottom: solid 5px #FFF;
-  border-left: solid 2px @fret-color;
+  border-left: solid @fret-size @fret-color;
 
   @media ( max-width: 400px ){
     & {
-      border-left-width: 1px;
+      border-left-width: @fret-size / 2;
       border-top-width: 3px;
     }
   }
