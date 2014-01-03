@@ -116,6 +116,14 @@
       var ex = config.settings.exercises.find( function( ex ){
         return ex.id === 'alternate-1-minor';
       });
+
+      config.settings.exercises.push({
+        "name": "Minor Postion Thing 1"
+      , "id": "minor-position-thing-1"
+      , "definition": [5,26,17,2,8,10,12,22,14,17,12,14,15,19,10,24,3,0,20,15,7,27]
+      , "guitarIntervalStringMap": ex.guitarIntervalStringMap
+      })
+
       config.settings.exercises.push({
         name: 'Random Minor 1'
       , id: 'random-minor-1'
@@ -145,6 +153,7 @@
       , exercise: 'major-one-octave'
       , tempo: config.settings.tempo
       , octave: config.settings.octave
+      , repeat: false
       };
 
       $.fn.instrument = function( options ){
@@ -367,7 +376,9 @@
         , onKeyChange:        function( key, e ){}
         , onExerciseChange:   function( exercise, e ){}
         , onTempoChange:      function( tempo, e ){}
-        , onPlay:             function(){}
+        , onRepeatChange:     function( repeat, e ){}
+        , onPlay:             function( e ){}
+        , onStop:             function( e ){}
         };
 
         options = $.extend( {}, defaults, options );
@@ -397,7 +408,21 @@
               options.onTempoChange( +e.target.value, e );
             });
 
-            $this.find('[name="play"]').click( options.onPlay );
+            $this.find('[name="play"]').click( function( e ){
+              if ( e.target.innerHTML === 'Stop' ){
+                e.target.innerHTML = 'Play';
+                options.onStop( e );
+              } else {
+                e.target.innerHTML = 'Stop';
+                options.onPlay( e );
+              }
+            });
+
+            $this.find('[name="repeat"]').attr(
+              'checked', app_state.repeat
+            ).on( 'change', function( e ){
+              options.onRepeatChange( !!e.target.checked, e );
+            });
           }
         };
 
@@ -421,6 +446,8 @@
           return async.series(
             exercise.definition.map( function( note ){
               return function( next ){
+                if ( playExercise.stop ) return next(true);
+
                 var noteId = config.settings.keys[ ( keyStart + note ) % ( config.settings.keys.length  ) ].id;
 
                 var guitarExtra = 0;
@@ -433,11 +460,7 @@
 
                 if ( app_state.instrument === 'acoustic' ){
                   var string = config.guitarStrings[ exercise.guitarIntervalStringMap[ note ] ];
-console.log(config.settings.keys.findIndex( function( k ){
-                        return k.id === string.id
-                      }) > config.settings.keys.findIndex( function( k ){
-                        return k.id === noteId
-                      }) ? 1 : 0)
+
                   instrumentView.highlightNotes([{
                     id: noteId
                   , octave: [
@@ -461,11 +484,18 @@ console.log(config.settings.keys.findIndex( function( k ){
               };
             })
           , function(){
+              if ( app_state.repeat && playExercise.stop !== true ){
+                return playExercise( key, exercise, callback );
+              }
+
+              playExercise.stop = false;
               instrumentView.clearHighlight();
               callback();
             }
           );
         };
+
+        playExercise.stop = false;
 
         $('.app-settings').app_settings({
           onInstrumentChange: function( id ){
@@ -488,10 +518,20 @@ console.log(config.settings.keys.findIndex( function( k ){
             app_state.exercise = exercise;
           }
 
-        , onPlay: function(){
+        , onRepeatChange: function( repeat ){
+            app_state.repeat = repeat;
+          }
+
+        , onPlay: function( e ){
             playExercise( app_state.key, config.settings.exercises.find( function( e ){
               return e.id === app_state.exercise;
-            }));
+            }), function(){
+              e.target.innerHTML = 'Play';
+            });
+          }
+
+        , onStop: function(){
+            playExercise.stop = true;
           }
         });
 
@@ -514,6 +554,7 @@ console.log(config.settings.keys.findIndex( function( k ){
       <select name="exercise" class="setting-control"></select>
       <input  name="tempo" type="number">
       <button name="play">Play</button>
+      <input  name="repeat" type="checkbox"> Repeat
     </div>
     <div class="instrument"></div>
   </body>

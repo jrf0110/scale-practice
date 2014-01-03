@@ -33,10 +33,11 @@
   border-radius: 2 * @dot-size;
   background: @dot-color;
 
-  media ( max-width: 400px ){
+  @media ( max-width: 400px ){
     & {
       width: @dot-size / 2;
       height: @dot-size / 2;
+      top: @dot-offset / 2;
     }
   }
 }
@@ -162,4 +163,10 @@
   .dot();
   top: auto;
   bottom: @dot-offset;
+  @media ( max-width: 400px ){
+    & {
+      top: auto;
+      bottom: @dot-offset / 2;
+    }
+  }
 }
