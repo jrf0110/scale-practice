@@ -41,7 +41,10 @@
             , guitarIntervalStringMap: {
                 0:  0,    2:  0,
                 4:  1,    5:  1,    7:  1,
-                9:  2,    11: 2,    12: 2
+                9:  2,    11: 2,    12: 2,
+                14: 3,    16: 3,    17: 3,
+                19: 4,    21: 4,
+                23: 5,    24: 5
               }
             }
           , {
@@ -84,7 +87,7 @@
             }
           ]
 
-        , tempo: 120
+        , tempo: 320
         , octave: 3
         }
 
@@ -122,7 +125,28 @@
       , "id": "minor-position-thing-1"
       , "definition": [5,26,17,2,8,10,12,22,14,17,12,14,15,19,10,24,3,0,20,15,7,27]
       , "guitarIntervalStringMap": ex.guitarIntervalStringMap
-      })
+      });
+
+      var majorTwo = config.settings.exercises.push({
+        name: 'The Major Scale (Two Octaves)'
+      , id: 'major-two-octave'
+      , definition: config.settings.exercises[0].definition
+      , guitarIntervalStringMap: config.settings.exercises[0].guitarIntervalStringMap
+      });
+
+      majorTwo = config.settings.exercises[ majorTwo - 1 ];
+
+      majorTwo.definition = majorTwo.definition.slice( 0, Math.floor(majorTwo.definition.length / 2) + 1 );
+
+      majorTwo.definition = majorTwo.definition.concat(
+        majorTwo.definition.slice(1).map( function( n, i, a ){
+          return a[ a.length - 1 ] + n;
+        })
+      );
+
+      majorTwo.definition = majorTwo.definition.concat(
+        majorTwo.definition.slice(0, majorTwo.definition.length - 1 ).reverse()
+      );
 
       config.settings.exercises.push({
         name: 'Random Minor 1'
@@ -147,10 +171,14 @@
         });
       });
 
+      config.settings.exercises = config.settings.exercises.sort( function( a, b ){
+        return a.name > b.name;
+      });
+
       var app_state = {
         instrument: 'acoustic'
       , key: 'C'
-      , exercise: 'major-one-octave'
+      , exercise: 'major-two-octave'
       , tempo: config.settings.tempo
       , octave: config.settings.octave
       , repeat: false
@@ -313,18 +341,7 @@
           }
 
         , highlightNotes: function( notes ){
-          console.log(notes[0], notes.map( function( note ){
-                return [
-                  'string' in note
-                    ? '.notes > .string:nth-child(' + (note.string + 1)+ ') '
-                    : ''
-                , '[data-note="'
-                , note.id
-                ,  '"][data-octave="'
-                , note.octave
-                , '"]'
-                ].join('');
-              }).join(', '));
+          console.log(notes[0])
             plugin.clearHighlight();
             $this.find(
               notes.map( function( note ){
@@ -466,11 +483,11 @@
                   , octave: [
                       octave
                     , string.octave
-                    , config.settings.keys.findIndex( function( k ){
-                        return k.id === string.id
-                      }) > config.settings.keys.findIndex( function( k ){
-                        return k.id === noteId
-                      }) ? 1 : 0
+                    // , config.settings.keys.findIndex( function( k ){
+                    //     return k.id === string.id
+                    //   }) > config.settings.keys.findIndex( function( k ){
+                    //     return k.id === noteId
+                    //   }) ? 1 : 0
                     ].sum()
                   , string: exercise.guitarIntervalStringMap[ note ]
                   }]);
