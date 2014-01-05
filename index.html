@@ -99,10 +99,12 @@
             }
           ]
 
-        , tempo: 320
+        , tempo: 200
         , octave: 3
         }
 
+      , sampleRate: 20000
+      , volume: 0.6
       , noteDuration: 2
       , noteMin: 1
 
@@ -124,6 +126,9 @@
         return function( callback ){
           callback = callback || function(){};
 
+          // The volume for this seems to really low
+          Synth.setVolume( 1 );
+
           var durationSec = 1 / (app_state.tempo / 60);
           var durationMicro = durationSec * 1000;
 
@@ -134,7 +139,10 @@
                 setTimeout( done, durationMicro );
               };
             })
-          , callback
+          , function(){
+              Synth.setVolume( config.volume );
+              callback();
+            }
           );
         };
       })();
@@ -578,8 +586,12 @@
         return plugin;
       };
 
+      Synth.setSampleRate( config.sampleRate );
+      Synth.setVolume( config.volume );
+
       var instrument = Synth.createInstrument( app_state.instrument );
       var guitar = new Guitar();
+      guitar.play([{ id: 'C', octave: 1, duration: 0.0001 }])
 
       $(function(){
         var playExercise = function( key, exercise, callback ){
@@ -639,15 +651,7 @@
         playExercise.stop = false;
 
         $('.app-settings').app_settings({
-          onInstrumentChange: function( id ){
-            if ( app_state.instrument === id ) return;
-
-            app_state.instrument = id;
-            instrument = Synth.createInstrument( app_state.instrument );
-            instrumentView.render();
-          }
-
-        , onKeyChange: function( key ){
+          onKeyChange: function( key ){
             if ( key === 'E' ){
               return alert('Sorry, the key of `E` is broken right now lol');
             }
@@ -685,11 +689,11 @@
 
         var instrumentView = $('.instrument').instrument({
           onNotePress: function( note, e ){
-            instrument.play(
-              note.id
-            , note.octave
-            , config.noteDuration
-            );
+            guitar.play([{
+              id:       note.id
+            , octave:   note.octave
+            , duration: config.noteDuration
+            }]);
           }
         });
       });
