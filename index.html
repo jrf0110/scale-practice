@@ -8,11 +8,21 @@
     <script src="/bower_components/sugar/release/sugar-full.development.js"></script>
     <script src="/bower_components/audiosynth/audiosynth.js"></script>
     <script>
+      Array.prototype.series = function(){
+        var series = [];
+        for ( var i = this[0]; i < this[1]; i++ ){
+          series.push( i );
+        }
+        return series;
+      };
+    </script>
+
+    <script>
       var config = {
         settings: {
           instruments: [
             { name: 'Guitar', id: 'acoustic' }
-          , { name: 'Piano', id: 'piano' }
+          // , { name: 'Piano', id: 'piano' }
           ]
 
         , keys: [
@@ -35,55 +45,57 @@
               name: 'The Major Scale (Single Octave)'
             , id: 'major-one-octave'
             , definition: [
-                0, 2, 4, 5, 7, 9, 11, 12
-              , 11, 9, 7, 5, 4, 2, 0
+                { string: 0, pos: 0  }, { string: 0, pos: 2 }
+              , { string: 1, pos: -1 }, { string: 1, pos: 0 }, { string: 1, pos: 2 }
+              , { string: 2, pos: -1 }, { string: 2, pos: 1 }, { string: 2, pos: 2 }
               ]
-            , guitarIntervalStringMap: {
-                0:  0,    2:  0,
-                4:  1,    5:  1,    7:  1,
-                9:  2,    11: 2,    12: 2,
-                14: 3,    16: 3,    17: 3,
-                19: 4,    21: 4,
-                23: 5,    24: 5
-              }
+            }
+          , {
+              name: 'The Major Scale (Double Octave)'
+            , id: 'major-two-octave'
+            , definition: [
+                { string: 0, pos: 0  }, { string: 0, pos: 2 }
+              , { string: 1, pos: -1 }, { string: 1, pos: 0 }, { string: 1, pos: 2 }
+              , { string: 2, pos: -1 }, { string: 2, pos: 1 }, { string: 2, pos: 2 }
+              , { string: 3, pos: -1 }, { string: 3, pos: 1 }, { string: 3, pos: 2 }
+              , { string: 4, pos: 0  }, { string: 4, pos: 2 }
+              , { string: 5, pos: -1 }, { string: 5, pos: 0 }
+              ]
             }
           , {
               name: 'The Minor Scale (Single Octave)'
             , id: 'minor-one-octave'
             , definition: [
-                0, 2, 3, 5, 7, 8, 10, 12
-              , 10, 8, 7, 5, 3, 2, 0
+                { string: 0, pos: 0  }, { string: 0, pos: 2 }, { string: 0, pos: 3 }
+              , { string: 1, pos: 0  }, { string: 1, pos: 2 }, { string: 1, pos: 3 }
+              , { string: 2, pos: 0  }, { string: 2, pos: 2 }
               ]
-            , guitarIntervalStringMap: {
-                0:  0,    2:  0,    3:  0,
-                5:  1,    7:  1,    8:  1,
-                10: 2,    12: 2,
-                14: 3,    15: 3,    17: 3,
-                19: 4,    20: 4,    22: 4,
-                24: 5,    26: 5,    27: 5
-              }
+            }
+          , {
+              name: 'The Minor Scale (Double Octave)'
+            , id: 'minor-two-octave'
+            , definition: [
+                { string: 0, pos: 0  }, { string: 0, pos: 2 }, { string: 0, pos: 3 }
+              , { string: 1, pos: 0  }, { string: 1, pos: 2 }, { string: 1, pos: 3 }
+              , { string: 2, pos: 0  }, { string: 2, pos: 2 }
+              , { string: 3, pos: -1 }, { string: 3, pos: 0 }, { string: 3, pos: 2 }
+              , { string: 4, pos: 0  }, { string: 4, pos: 1 }, { string: 4, pos: 3 }
+              , { string: 5, pos: 0  }
+              ]
             }
           , {
               name: 'Alternate 1 Minor'
             , id: 'alternate-1-minor'
             , definition: [
-                0, 2, 3
-              , 10, 12
-              , 5, 7, 8
-              , 14, 15, 17
-              , 10, 12
-              , 19, 20, 22
-              , 14, 15, 17
-              , 24, 26, 27
+                { string: 0, pos: 0  }, { string: 0, pos: 2 }, { string: 0, pos: 3 }
+              , { string: 2, pos: 0  }, { string: 2, pos: 2 }
+              , { string: 1, pos: 0  }, { string: 1, pos: 2 }, { string: 1, pos: 3 }
+              , { string: 3, pos: -1 }, { string: 3, pos: 0 }, { string: 3, pos: 2 }
+              , { string: 2, pos: 0  }, { string: 2, pos: 2 }
+              , { string: 4, pos: 0  }, { string: 4, pos: 1 }, { string: 4, pos: 3 }
+              , { string: 3, pos: -1 }, { string: 3, pos: 0 }, { string: 3, pos: 2 }
+              , { string: 5, pos: 0  }, { string: 5, pos: 2 }, { string: 5, pos: 3 }
               ]
-            , guitarIntervalStringMap: {
-                0:  0,    2:  0,    3:  0,
-                5:  1,    7:  1,    8:  1,
-                10: 2,    12: 2,
-                14: 3,    15: 3,    17: 3,
-                19: 4,    20: 4,    22: 4,
-                24: 5,    26: 5,    27: 5
-              }
             }
           ]
 
@@ -102,73 +114,174 @@
         , { id: 'B', octave: 3 }
         , { id: 'E', octave: 4 }
         ]
+
+      , guitarNumFrets: 16
+      };
+
+      var playFourClicks = (function(){
+        var synth = Synth.createInstrument('piano');
+
+        return function( callback ){
+          callback = callback || function(){};
+
+          var durationSec = 1 / (app_state.tempo / 60);
+          var durationMicro = durationSec * 1000;
+
+          async.series(
+            [ 0, 4 ].series().map( function(){
+              return  function( done ){
+                synth.play( 'C', 6, 0.1 );
+                setTimeout( done, durationMicro );
+              };
+            })
+          , callback
+          );
+        };
+      })();
+
+      var guitarNotes = {};
+
+      var Guitar = function( options ){
+        var defaults = {
+          frets: 16
+        , strings: config.guitarStrings.slice(0)
+        , synthName: 'acoustic'
+        , defaultDuration: 3
+        };
+
+        this.options = $.extend( {}, defaults, options );
+        
+        this.synth = Synth.createInstrument( this.options.synthName );
+        this.initNotes();
+
+        return this;
+      };
+
+      Guitar.prototype.initNotes = function(){
+        var this_ = this;
+
+        this.notes = {};
+
+        this.options.strings.forEach( function( str, i ){
+          var keys  = config.settings.keys;
+          var notes = this_.notes[ str.id ] = this_.notes[ i ] = [];
+          var start = keys.findIndex( function( k ){
+            return k.id === str.id;
+          });
+
+          for ( var i = 0, l = keys.length; i < this_.options.frets; i++ ){
+            notes.push({
+              id:       keys[ ( start + i ) % l ].id
+            , octave:   str.octave + Math.floor( ( start + i ) / l )
+            });
+          }
+        });
+      };
+
+      Guitar.prototype.play = function( notes ){
+        for ( var i = 0, l = notes.length, note; i < l; ++i ){
+          if ( 'string' in notes[ i ] ){
+            note = this.notes[ notes[ i ].string ][ notes[ i ].fret ];
+          }
+
+          this.synth.play(
+            notes[ i ].id       || note.id
+          , notes[ i ].octave   || note.octave
+          , notes[ i ].duration || this.options.duration
+          );
+        }
+
+        return this;
       };
 
       var stepsFrom = function( n1, n2 ){
-        return Math.abs(
-          config.settings.keys.findIndex( function( k ){
-            return k.id === n1
-          })
-          -
-          config.settings.keys.findIndex( function( k ){
-            return k.id === n2
-          })
-        );
+        var steps = 0, keys = config.settings.keys, l = keys.length;
+        var start = keys.findIndex( function( k ){
+          return k.id === n1;
+        });
+
+        while ( keys[ start++ % l ].id !== n2 ) steps++;
+
+        return steps;
       };
 
-      var ex = config.settings.exercises.find( function( ex ){
-        return ex.id === 'alternate-1-minor';
-      });
+      var noteAt = function( n1, steps ){
+        if ( steps === 0 ) return n1;
 
-      config.settings.exercises.push({
-        "name": "Minor Postion Thing 1"
-      , "id": "minor-position-thing-1"
-      , "definition": [5,26,17,2,8,10,12,22,14,17,12,14,15,19,10,24,3,0,20,15,7,27]
-      , "guitarIntervalStringMap": ex.guitarIntervalStringMap
-      });
+        var keys = config.settings.keys;
+        var start = keys.findIndex( function( k ){
+          return k.id === n1;
+        });
 
-      var majorTwo = config.settings.exercises.push({
-        name: 'The Major Scale (Two Octaves)'
-      , id: 'major-two-octave'
-      , definition: config.settings.exercises[0].definition
-      , guitarIntervalStringMap: config.settings.exercises[0].guitarIntervalStringMap
-      });
+        return keys[ (start + steps) % keys.length ].id;
+      };
 
-      majorTwo = config.settings.exercises[ majorTwo - 1 ];
+      // var ex = config.settings.exercises.find( function( ex ){
+      //   return ex.id === 'alternate-1-minor';
+      // });
 
-      majorTwo.definition = majorTwo.definition.slice( 0, Math.floor(majorTwo.definition.length / 2) + 1 );
+      // config.settings.exercises.push({
+      //   "name": "Minor Postion Thing 1"
+      // , "id": "minor-position-thing-1"
+      // , "definition": [5,26,17,2,8,10,12,22,14,17,12,14,15,19,10,24,3,0,20,15,7,27]
+      // , "guitarIntervalStringMap": ex.guitarIntervalStringMap
+      // });
 
-      majorTwo.definition = majorTwo.definition.concat(
-        majorTwo.definition.slice(1).map( function( n, i, a ){
-          return a[ a.length - 1 ] + n;
-        })
-      );
+      // var majorTwo = config.settings.exercises.push({
+      //   name: 'The Major Scale (Two Octaves)'
+      // , id: 'major-two-octave'
+      // , definition: config.settings.exercises[0].definition
+      // , guitarIntervalStringMap: config.settings.exercises[0].guitarIntervalStringMap
+      // });
 
-      majorTwo.definition = majorTwo.definition.concat(
-        majorTwo.definition.slice(0, majorTwo.definition.length - 1 ).reverse()
-      );
+      // majorTwo = config.settings.exercises[ majorTwo - 1 ];
 
-      config.settings.exercises.push({
-        name: 'Random Minor 1'
-      , id: 'random-minor-1'
-      , definition: ex.definition.slice(0).randomize()
-      , guitarIntervalStringMap: ex.guitarIntervalStringMap
-      });
+      // majorTwo.definition = majorTwo.definition.slice( 0, Math.floor(majorTwo.definition.length / 2) + 1 );
 
-      // Reversable exercises
+      // majorTwo.definition = majorTwo.definition.concat(
+      //   majorTwo.definition.slice(1).map( function( n, i, a ){
+      //     return a[ a.length - 1 ] + n;
+      //   })
+      // );
+
+      // majorTwo.definition = majorTwo.definition.concat(
+      //   majorTwo.definition.slice(0, majorTwo.definition.length - 1 ).reverse()
+      // );
+
+      // config.settings.exercises.push({
+      //   name: 'Random Minor 1'
+      // , id: 'random-minor-1'
+      // , definition: ex.definition.slice(0).randomize()
+      // , guitarIntervalStringMap: ex.guitarIntervalStringMap
+      // });
+
+      // // Reversable exercises
+      // [
+      //   'alternate-1-minor'
+      // ].forEach( function( reversable ){
+      //   var exercise = config.settings.exercises.find( function( ex ){
+      //     return ex.id === reversable;
+      //   });
+
+      //   config.settings.exercises.push({
+      //     name:                     exercise.name + ' Reversed'
+      //   , id:                       exercise.id + '-reversed'
+      //   , definition:               exercise.definition.slice(0).reverse()
+      //   , guitarIntervalStringMap:  exercise.guitarIntervalStringMap
+      //   });
+      // });
+
+      // Mirrorable exercises
       [
-        'alternate-1-minor'
-      ].forEach( function( reversable ){
+        // 'major-one-octave'
+      ].forEach( function( mirrorable ){
         var exercise = config.settings.exercises.find( function( ex ){
-          return ex.id === reversable;
+          return ex.id === mirrorable;
         });
 
-        config.settings.exercises.push({
-          name:                     exercise.name + ' Reversed'
-        , id:                       exercise.id + '-reversed'
-        , definition:               exercise.definition.slice(0).reverse()
-        , guitarIntervalStringMap:  exercise.guitarIntervalStringMap
-        });
+        exercise.definition = exercise.definition.concat( exercise.definition.slice(
+          0, exercise.definition.length - 1
+        ).reverse() );
       });
 
       config.settings.exercises = config.settings.exercises.sort( function( a, b ){
@@ -178,10 +291,11 @@
       var app_state = {
         instrument: 'acoustic'
       , key: 'C'
-      , exercise: 'major-two-octave'
+      , exercise: 'major-one-octave'
       , tempo: config.settings.tempo
       , octave: config.settings.octave
       , repeat: false
+      , reverse: false
       };
 
       $.fn.instrument = function( options ){
@@ -341,19 +455,12 @@
           }
 
         , highlightNotes: function( notes ){
-          console.log(notes[0])
             plugin.clearHighlight();
             $this.find(
               notes.map( function( note ){
                 return [
-                  'string' in note
-                    ? '.notes > .string:nth-child(' + (note.string + 1) + ') '
-                    : ''
-                , '[data-note="'
-                , note.id
-                ,  '"][data-octave="'
-                , note.octave
-                , '"]'
+                  '.notes > .string:nth-child(' + (note.string + 1) + ') '
+                , ' .note:nth-child(' + note.fret + ')'
                 ].join('');
               }).join(', ')
             ).addClass('active');
@@ -361,6 +468,17 @@
 
         , clearHighlight: function(){
             $this.find('.note.active').removeClass('active');
+          }
+
+        , play: function( notes ){
+            $this.find(
+              notes.map( function( note ){
+                return [
+                  '.notes > .string:nth-child(' + (note.string + 1) + ') '
+                , ' .note:nth-child(' + note.fret + ')'
+                ].join('');
+              }).join(', ')
+            ).trigger('mousedown');
           }
         };
 
@@ -394,6 +512,7 @@
         , onExerciseChange:   function( exercise, e ){}
         , onTempoChange:      function( tempo, e ){}
         , onRepeatChange:     function( repeat, e ){}
+        , onReverseChange:     function( reverse, e ){}
         , onPlay:             function( e ){}
         , onStop:             function( e ){}
         };
@@ -435,11 +554,22 @@
               }
             });
 
-            $this.find('[name="repeat"]').attr(
-              'checked', app_state.repeat
-            ).on( 'change', function( e ){
-              options.onRepeatChange( !!e.target.checked, e );
+            // Checkboxes
+            [
+              'reverse'
+            , 'repeat'
+            ].forEach( function( prop ){
+              $this.find('[name="' + prop + '"]').attr(
+                'checked', app_state.repeat
+              ).on( 'change', function( e ){
+                options[ [
+                  'on'
+                , prop[0].toUpperCase() + prop.slice(1)
+                , 'Change'
+                ].join('') ]( !!e.target.checked, e );
+              });
             });
+
           }
         };
 
@@ -449,10 +579,16 @@
       };
 
       var instrument = Synth.createInstrument( app_state.instrument );
+      var guitar = new Guitar();
 
       $(function(){
         var playExercise = function( key, exercise, callback ){
           callback = callback || function(){};
+
+          if ( exercise.definition.length === 0 ) return callback();
+
+          var rootString = config.guitarStrings[ exercise.definition[0].string ].id;
+          var rootFret = stepsFrom( rootString, app_state.key );
 
           var durationSec = 1 / (app_state.tempo / 60);
           var durationMicro = durationSec * 1000;
@@ -460,56 +596,44 @@
             return k.id === key;
           });
 
-          return async.series(
-            exercise.definition.map( function( note ){
-              return function( next ){
-                if ( playExercise.stop ) return next(true);
+          fns = exercise.definition.map( function( step ){
+            return function( next ){
+              if ( playExercise.stop ) return next(true);
 
-                var noteId = config.settings.keys[ ( keyStart + note ) % ( config.settings.keys.length  ) ].id;
+              if ( app_state.instrument === 'acoustic' ){
+                var notes = [{
+                  fret: rootFret + step.pos
+                , string: step.string
+                , duration: durationSec
+                }];
 
-                var guitarExtra = 0;
-
-                var octave = Math.floor(
-                  ( keyStart + note ) / ( config.settings.keys.length )
-                );
-
-                instrument.play( noteId, app_state.octave + octave, Math.min( durationSec * 3, config.noteMin ) );
-
-                if ( app_state.instrument === 'acoustic' ){
-                  var string = config.guitarStrings[ exercise.guitarIntervalStringMap[ note ] ];
-
-                  instrumentView.highlightNotes([{
-                    id: noteId
-                  , octave: [
-                      octave
-                    , string.octave
-                    // , config.settings.keys.findIndex( function( k ){
-                    //     return k.id === string.id
-                    //   }) > config.settings.keys.findIndex( function( k ){
-                    //     return k.id === noteId
-                    //   }) ? 1 : 0
-                    ].sum()
-                  , string: exercise.guitarIntervalStringMap[ note ]
-                  }]);
-                } else {
-                  instrumentView.highlightNotes([
-                    { id: noteId, octave: octave }
-                  ]);
-                }
-
-                setTimeout( next, durationMicro );
-              };
-            })
-          , function(){
-              if ( app_state.repeat && playExercise.stop !== true ){
-                return playExercise( key, exercise, callback );
+                guitar.play( notes );
+                webkitRequestAnimationFrame( instrumentView.highlightNotes.fill( notes ) );
+              } else {
+                instrumentView.highlightNotes([
+                  { id: noteId, octave: octave }
+                ]);
               }
 
-              playExercise.stop = false;
-              instrumentView.clearHighlight();
-              callback();
+              setTimeout( next, durationMicro );
+            };
+          });
+
+          if ( app_state.reverse ){
+            fns = fns.concat( fns.slice( 0, fns.length - 1 ).reverse() );
+          }
+
+          fns = [ playFourClicks ].concat( fns );
+
+          return async.series( fns, function(){
+            if ( app_state.repeat && playExercise.stop !== true ){
+              return playExercise( key, exercise, callback );
             }
-          );
+
+            playExercise.stop = false;
+            instrumentView.clearHighlight();
+            callback();
+          });
         };
 
         playExercise.stop = false;
@@ -524,6 +648,9 @@
           }
 
         , onKeyChange: function( key ){
+            if ( key === 'E' ){
+              return alert('Sorry, the key of `E` is broken right now lol');
+            }
             app_state.key = key;
           }
 
@@ -537,6 +664,10 @@
 
         , onRepeatChange: function( repeat ){
             app_state.repeat = repeat;
+          }
+
+        , onReverseChange: function( reverse ){
+            app_state.reverse = reverse;
           }
 
         , onPlay: function( e ){
@@ -571,7 +702,10 @@
       <select name="exercise" class="setting-control"></select>
       <input  name="tempo" type="number">
       <button name="play">Play</button>
-      <input  name="repeat" type="checkbox"> Repeat
+      <input  name="reverse" type="checkbox" id="checkbox-reverse">
+      <label for="checkbox-reverse">Reverse</label>
+      <input  name="repeat" type="checkbox" id="checkbox-repeat">
+      <label for="checkbox-repeat">Repeat</label>
     </div>
     <div class="instrument"></div>
   </body>
