@@ -591,6 +591,9 @@
 
       var instrument = Synth.createInstrument( app_state.instrument );
       var guitar = new Guitar();
+
+      // Play a mostly inaudible prep sound so the audio API is ready
+      // to go whenever the user interacts
       guitar.play([{ id: 'C', octave: 1, duration: 0.0001 }])
 
       $(function(){
