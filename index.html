@@ -103,7 +103,8 @@
             mySynth.play({
               id:       note.id
             , octave:   note.octave
-            }).stop( config.noteDuration );
+            , duration: config.noteDuration
+            });
           }
         });
 

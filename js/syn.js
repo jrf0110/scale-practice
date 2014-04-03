@@ -41,6 +41,41 @@ var syn = (function(){
     }
   }
 
+  var createDistortionWaveShaper = function( context, dist, n_samples ){
+    dist = dist || 0.8;
+    n_samples = n_samples || 1000;
+
+    var shaper = context.createWaveShaper();
+    var k = 2 * dist / (1 - dist);
+
+    var curve = new Float32Array( n_samples );
+
+    for (var i = 0; i < n_samples; i+=1) {
+        // LINEAR INTERPOLATION: x := (c - a) * (z - y) / (b - a) + y
+        // a = 0, b = 2048, z = 1, y = -1, c = i
+        var x = (i - 0) * (1 - (-1)) / (n_samples - 0) + (-1);
+        curve[i] = (1 + k) * x / (1+ k * Math.abs(x));
+    }
+    
+    shaper.curve = curve;
+
+    return shaper;
+  };
+
+  var createGuitarWaveShaper = function( context, frequency ){
+    var nodes = [];
+
+    nodes.push( createDistortionWaveShaper( context, 1.01 ) );
+
+    nodes.forEach( function( n, i ){
+      if ( i !== nodes.length - 1 ){
+        n.connect( nodes[ i + 1 ] );
+      }
+    });
+
+    return nodes[ nodes.length - 1 ];
+  };
+
   var player = {
     // init: function( frequencies, context, destination ){
     init: function( options ){
@@ -64,6 +99,11 @@ var syn = (function(){
 
       this.oscillators = this.frequencies.map( function( f ){
         var osc = options.context.createOscillator();
+        var shaper = createGuitarWaveShaper( context, f );
+        var delay = options.context.createDelayNode();
+
+        delay.delayTime.value = 0.03;
+
         osc.type.value = 0;
         osc.frequency.value = f;
 
@@ -71,7 +111,11 @@ var syn = (function(){
         osc.start = ( osc.noteOn || osc.start ).defaults(0).bind( osc );
         osc.stop = ( osc.noteOff || osc.stop ).defaults(0).bind( osc );
 
-        osc.connect( options.destination );
+
+        shaper.connect( options.destination );
+        shaper.connect( delay );
+        osc.connect( shaper );
+        options.destination.connect( delay );
 
         return osc;
       });
@@ -107,9 +151,16 @@ var syn = (function(){
     noteFrequencyTable: noteFrequencyTable
 
   , init: function( options ){
+      options = options || {};
+
       this.context = context;
       this.gainNode = context.createGainNode();
       this.gainNode.connect( context.destination );
+
+      this.adsr = Object.merge({
+        attack: 0.002
+      , 
+      }, options.adsr || {} );
 
       return this;
     }
@@ -128,20 +179,39 @@ var syn = (function(){
 
   , play: function( notes, delay ){
       var this_ = this;
+      var now = this.context.currentTime;
 
       if ( !Array.isArray( notes ) ){
         notes = [ notes ];
       }
 
+      var duration;
       var frequencies = notes.map( function( note ){
-        return this_.noteFrequencyTable[ note.id + note.octave ];
+        // Pretty shady, but pick one duration
+        duration = note.duration;
+
+        return Object.merge( this_.noteFrequencyTable[ note.id + note.octave ], {
+          duration: note.duration
+        });
       });
 
-      return Object.create( player ).init({
+      this.gainNode.gain.cancelScheduledValues( now );
+      this.gainNode.gain.setValueAtTime( this.gainNode.gain.value, now );
+
+      this.gainNode.gain.linearRampToValueAtTime( 1.0, now + this.adsr.attack );
+      this.gainNode.gain.exponentialRampToValueAtTime( 0.01, now + duration );
+
+      var p = Object.create( player ).init({
         frequencies:  frequencies
       , context:      this.context
       , destination:  this.gainNode
       }).play( delay );
+
+      if ( duration ){
+        p.stop( duration + ( delay || 0 ) );
+      }
+
+      return p;
     }
   };
 

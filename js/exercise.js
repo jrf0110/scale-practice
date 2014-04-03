@@ -44,10 +44,12 @@ var exercise = (function(){
           }];
 
           var notes = notesFrets.map( function( f ){
-            return guitarNoteMap[ f.string ][ f.fret ];
+            return Object.merge( guitarNoteMap[ f.string ][ f.fret ], {
+              duration: durationSec
+            });
           });
 
-          this_.synth.play( notes ).stop( durationSec );
+          this_.synth.play( notes );
           RequestAnimationFrame( this_.view.highlightNotes.fill( notesFrets ) );
 
           setTimeout( next, durationMicro );
