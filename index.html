@@ -6,7 +6,6 @@
     <script src="/bower_components/jquery/jquery.js"></script>
     <script src="/bower_components/async/lib/async.js"></script>
     <script src="/bower_components/sugar/release/sugar-full.development.js"></script>
-    <script src="/bower_components/audiosynth/audiosynth.js"></script>
 
     <script src="/js/config.js"></script>
     <script src="/js/utils.js"></script>
@@ -18,23 +17,6 @@
     <script src="/js/exercise.js"></script>
 
     <script>
-      var guitarNoteMap = [], frets = 24;
-      config.guitarStrings.forEach( function( base ){
-        var str = [], keys = config.settings.keys;
-        var baseIdx = keys.findIndex( function( k ){
-          return k.id === base.id;
-        });
-
-        for ( var i = 0, l = keys.length; i < frets; i++ ){
-          str.push({
-            id:     keys[ ( baseIdx + i ) % l ].id
-          , octave: base.octave + Math.floor( ( baseIdx + i ) / l )
-          });
-        }
-
-        guitarNoteMap.push( str );
-      });
-
       var app_state = {
         instrument: 'acoustic'
       , key: 'C'
@@ -44,9 +26,6 @@
       , repeat: false
       , reverse: false
       };
-
-      Synth.setSampleRate( config.sampleRate );
-      Synth.setVolume( config.volume );
 
       var mySynth = syn.createSynthesizer();
 

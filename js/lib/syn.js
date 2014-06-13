@@ -63,17 +63,17 @@ var syn = (function(){
   };
 
   var createGuitarWaveShaper = function( context, frequency ){
-    var nodes = [];
+    return createDistortionWaveShaper( context, 0.5, 1000 );
 
-    nodes.push( createDistortionWaveShaper( context, 1.01 ) );
+    // var nodes = [];
 
-    nodes.forEach( function( n, i ){
-      if ( i !== nodes.length - 1 ){
-        n.connect( nodes[ i + 1 ] );
-      }
-    });
+    // nodes.push( createDistortionWaveShaper( context, 5, 1000 ) );
 
-    return nodes[ nodes.length - 1 ];
+    // for ( var i = 0, l = 6; i < l; i++ ){
+    //   nodes[ i - 1 ].connect( nodes[ i ] );
+    // }
+
+    // return nodes[ nodes.length - 1 ];
   };
 
   var player = {

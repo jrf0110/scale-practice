@@ -7,3 +7,4 @@ css/*.gen.css
 .htpasswd
 build/
 nginx
+dist/
