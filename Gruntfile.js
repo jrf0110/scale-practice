@@ -31,7 +31,7 @@ module.exports = function( grunt ){
       }
 
     , browserify: {
-        files: ['js/*.js', 'js/**.js'],
+        files: [],
         tasks: ['browserify'],
         options: { spawn: false }
       }
@@ -73,7 +73,13 @@ module.exports = function( grunt ){
         files: {
           'dist/app.js': ['js/app.js'],
         }
-      , options: {}
+      , options: {  
+          bundleOptions: {
+            debug: true
+          }
+        , transform: ['requireify']
+        , require: ['./js/app.js']
+        }
       }
     }
   };
@@ -81,6 +87,8 @@ module.exports = function( grunt ){
   config.watch.jshint.files = config.watch.jshint.files.concat(
     config.jshint.all
   );
+
+  config.watch.browserify.files = config.watch.jshint.files;
 
   grunt.initConfig( config );
 

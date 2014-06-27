@@ -1,5 +1,11 @@
-$.fn.instrument = function( options ){
-  var $this = this;
+var $         = require('jquery');
+var appState  = require('../app-state');
+var config    = require('../config');
+
+module.exports = function( $this, options ){
+  if ( !($this instanceof $) ){
+    $this = $( $this );
+  }
 
   var defaults = {
     keyboardNumOctaves: 3
@@ -80,9 +86,9 @@ $.fn.instrument = function( options ){
 
   var plugin = {
     render: function(){
-      if ( app_state.instrument === 'piano' ){
+      if ( appState.instrument === 'piano' ){
         plugin.renderPiano();
-      } else if ( app_state.instrument === 'acoustic' ){
+      } else if ( appState.instrument === 'guitar' ){
         plugin.renderGuitar();
       }
 
@@ -92,8 +98,8 @@ $.fn.instrument = function( options ){
           {
             id: $el.data('note')
           , octave: $el.data('octave') + (
-                      app_state.instrument === 'piano' ?
-                        app_state.octave : 0
+                      appState.instrument === 'piano' ?
+                        appState.octave : 0
                     )
           }
         , e
@@ -116,11 +122,11 @@ $.fn.instrument = function( options ){
 
       var keys = { white: '', black: '' };
       for ( var i = 0; i < options.keyboardNumOctaves; i++ ){
-        keys.black += config.settings.keys.filter(
+        keys.black += config.keys.filter(
           keyGtOne
         ).map( getKeyHtml ).join('\n');
 
-        keys.white += config.settings.keys.filter(
+        keys.white += config.keys.filter(
           keyEqOne
         ).map( getKeyHtml ).join('\n');
       }
@@ -133,7 +139,7 @@ $.fn.instrument = function( options ){
       var i, ii, frets, noteIndex, string;
 
       var findIndex = function( string ){
-        return config.settings.keys.findIndex( function( key ){
+        return config.keys.findIndex( function( key ){
           return key.id === string.id;
         });
       };
@@ -145,9 +151,9 @@ $.fn.instrument = function( options ){
 
         for ( ii = 0; ii < options.guitarNumFrets; ii++ ){
           frets += options.guitarNoteFretTemplate({
-            octave: string.octave + Math.floor( ( noteIndex + 1 + ii ) / (config.settings.keys.length ) )
-          , note: config.settings.keys[
-              ( noteIndex + 1 + ii ) % config.settings.keys.length
+            octave: string.octave + Math.floor( ( noteIndex + 1 + ii ) / (config.keys.length ) )
+          , note: config.keys[
+              ( noteIndex + 1 + ii ) % config.keys.length
             ].id
           });
         }

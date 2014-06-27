@@ -3,97 +3,10 @@
   <head>
     <link rel="stylesheet" href="/css/core.gen.css">
 
-    <script src="/bower_components/jquery/jquery.js"></script>
-    <script src="/bower_components/async/lib/async.js"></script>
-    <script src="/bower_components/sugar/release/sugar-full.development.js"></script>
-
-    <script src="/js/config.js"></script>
-    <script src="/js/utils.js"></script>
-    <script src="/js/normalize-apis.js"></script>
-    <script src="/js/syn.js"></script>
-    <script src="/js/app-settings.js"></script>
-    <script src="/js/instrument-view.js"></script>
-    <script src="/js/metronome.js"></script>
-    <script src="/js/exercise.js"></script>
-
-    <script>
-      var app_state = {
-        instrument: 'acoustic'
-      , key: 'C'
-      , exercise: 'major-one-octave'
-      , tempo: config.settings.tempo
-      , octave: config.settings.octave
-      , repeat: false
-      , reverse: false
-      };
-
-      var mySynth = syn.createSynthesizer();
-
-      // Play a mostly inaudible prep sound so the audio API is ready
-      // to go whenever the user interacts
-      mySynth.playFrequencies( 10 ).stop(0.00000001);
-
-      $(function(){
-        $('.app-settings').appSettings({
-          onKeyChange: function( key ){
-            if ( key === 'E' ){
-              return alert('Sorry, the key of `E` is broken right now lol');
-            }
-            app_state.key = key;
-          }
-
-        , onTempoChange: function( tempo ){
-            app_state.tempo = tempo;
-            metronome.setTempo( tempo );
-          }
-
-        , onExerciseChange: function( exercise ){
-            app_state.exercise = exercise;
-          }
-
-        , onRepeatChange: function( repeat ){
-            app_state.repeat = repeat;
-          }
-
-        , onReverseChange: function( reverse ){
-            app_state.reverse = reverse;
-          }
-
-        , onPlay: function( e ){
-            exercise.play(
-              config.settings.exercises.find( function( e ){
-                return e.id === app_state.exercise;
-              })
-            , app_state.key
-            , app_state.tempo
-            , function(){
-                e.target.innerHTML = 'Play';
-              }
-            );
-          }
-
-        , onStop: function(){
-            exercise.stop();
-          }
-        });
-
-        var instrumentView = $('.instrument').instrument({
-          onNotePress: function( note, e ){
-            mySynth.play({
-              id:       note.id
-            , octave:   note.octave
-            , duration: config.noteDuration
-            });
-          }
-        });
-
-        exercise.setView( instrumentView );
-      });
-    </script>
+    <script src="/dist/app.js"></script>
   </head>
   <body>
     <div class="app-settings">
-      <select name="instrument" class="setting-control"></select>
       <select name="key" class="setting-control"></select>
       <select name="exercise" class="setting-control"></select>
       <input  name="tempo" type="number">

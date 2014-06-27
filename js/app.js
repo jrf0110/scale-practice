@@ -1,23 +1,47 @@
 require('sugar');
 
 var $         = require('jquery');
-
-var exerciser = require('./exercies');
+var syn       = require('./lib/syn');
+var ePlayer   = require('./lib/exercise-player').create();
+var exercises = require('./exercises');
+var config    = require('./config');
 var state     = require('./app-state');
 
 // Load jQuery plugin views
-require('./views/app-settings');
+var Views = {
+  appSettings:  require('./views/settings')
+, instrument:   require('./views/instrument')
+};
 
 var exports = window.app = module.exports;
+var views = module.exports.views = {};
 
-module.exports.views = {};
+var synth = exports.synth = syn.createSynthesizer();
+
+exports.state = state;
 
 $(function(){
-  module.exports.views.appSettings = $('.app-settings').appSettings();
+  views.appSettings = Views.appSettings( '.app-settings', {
+    onPlay: function( e ){
+      ePlayer.play(
+        exercises.find( function( ex ){
+          return ex.id === state.exercise;
+        })
+      , function(){
+          e.target.innerHTML = 'Play';
+          views.instrument.clearHighlight();
+        }
+      );
+    }
 
-  module.exports.views.instrument = $('.instrument').instrument({
+  , onStop: function(){
+      ePlayer.stop();
+    }
+  });
+
+  views.instrument = Views.instrument( '.instrument', {
     onNotePress: function( note, e ){
-      mySynth.play({
+      synth.play({
         id:       note.id
       , octave:   note.octave
       , duration: config.noteDuration
@@ -25,5 +49,14 @@ $(function(){
     }
   });
 
-  exercise.setView( module.exports.views.instrument );
+  ePlayer.on( 'notes', function( notes, notesFrets ){
+    synth.play( notes );
+
+    RequestAnimationFrame(
+      views.instrument.highlightNotes.bind(
+        views.instrument.highlightNotes
+      , notesFrets
+      )
+    );
+  });
 });
