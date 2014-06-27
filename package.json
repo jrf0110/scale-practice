@@ -12,10 +12,8 @@
     "async": "~0.2.9",
     "browserify": "^4.1.9",
     "jquery": "^2.1.1",
-    "jsdom": "~0.3.4",
     "lodash": "^2.4.1",
-    "sugar": "^1.4.1",
-    "wrench": "~1.5.4"
+    "sugar": "^1.4.1"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

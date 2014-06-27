@@ -15,5 +15,3 @@ module.exports = utils.createEventEmitter({
 , repeat:       false
 , reverse:      false
 });
-
-console.log('instrument:', module.exports.instrument);
