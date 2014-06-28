@@ -1,3 +1,9 @@
+/**
+ * For each string, for each fret, index the note
+ *
+ * guitarNoteMap[0][5] // => {id: "A", octave: 1}
+ */
+
 var config = require('../config');
 
 var guitarNoteMap = module.exports = [], frets = 24;
