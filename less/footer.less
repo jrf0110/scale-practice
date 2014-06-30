@@ -1,0 +1,29 @@
+////////////
+// Footer //
+////////////
+
+.footer {
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  .frosty-panel();
+  .standard-padding();
+
+  // So the blurred bg does not go on top
+  * { position: relative; }
+}
+
+.footer .logo {
+  font-family: @font-family-script;
+  font-size: 26px;
+  display: inline-block;
+  color: rgba(255, 255, 255, 0.87);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8);
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.footer .signature {
+  font-size: 12px;
+  margin-left: 2px;
+}

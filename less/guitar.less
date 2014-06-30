@@ -53,6 +53,7 @@
 .guitar {
   height: @neck-height;
   .transform( scaleX(-1) );
+  .box-shadow( 0 5px 25px rgba(0, 0, 0, 0.5) );
 
   @media ( max-width: 400px ){
     & {
@@ -107,7 +108,7 @@
   margin-top: -( @string-max-size / 2 ) - ( @fret-padding / 2 );
   cursor: pointer;
   border-left: solid rgba(0, 0, 0, 0) @fret-size;
-  border-radius: 10px;
+  // border-radius: 10px;
 
   &.active,
   &:hover {

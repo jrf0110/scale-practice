@@ -6,16 +6,22 @@
     <script src="/dist/app.js"></script>
   </head>
   <body>
-    <div class="app-settings">
-      <select name="key" class="setting-control"></select>
-      <select name="exercise" class="setting-control"></select>
-      <input  name="tempo" type="number">
-      <button name="play">Play</button>
-      <input  name="reverse" type="checkbox" id="checkbox-reverse">
-      <label for="checkbox-reverse">Reverse</label>
-      <input  name="repeat" type="checkbox" id="checkbox-repeat">
-      <label for="checkbox-repeat">Repeat</label>
-    </div>
+    <header class="header">
+      <div class="app-settings">
+        <select name="key" class="setting-control"></select>
+        <select name="exercise" class="setting-control"></select>
+        <input  name="tempo" type="number">
+        <button name="play">Play</button>
+        <input  name="reverse" type="checkbox" id="checkbox-reverse">
+        <label for="checkbox-reverse">Reverse</label>
+        <input  name="repeat" type="checkbox" id="checkbox-repeat">
+        <label for="checkbox-repeat">Repeat</label>
+      </div>
+    </header>
     <div class="instrument"></div>
+    <footer class="footer">
+      <span class="logo">Scale Practice</span>
+      <span class="signature">by <a href="http://j0.hn">John Fawcett</a></span>
+    </footer>
   </body>
 </html>

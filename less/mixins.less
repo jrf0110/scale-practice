@@ -2,76 +2,26 @@
 // Mixins //
 ////////////
 
-#grid {
-  .container(){
-    display: table;
-    width: @container-width;
-    margin: 0 auto;
+.frosty-panel {
+  // background-color: rgba(31, 50, 128, 0.42);
+  background-color: fadeout( @panel-bg-color, 58% );
+  box-shadow:
+    inset 0 1px 0 rgba( 255, 255, 255, 0.26 )
+  , 0 -1px 5px rgba( 0, 0, 0, 0.5 );
+  border-top: solid 1px rgba( 0, 0, 0, 0.3 );
+  color: rgba(255, 255, 255, 0.87);
 
-    @media screen and ( max-width: @container-width ){
-      & {
-        width: 100%;
-      }
-    }
-  }
-
-  .row(){
-    display: table;
+  &:before {
+    content: "";
+    background-image: url(@body-bg-image);
+    position: absolute;
+    left: 0;
+    top: 0;
     width: 100%;
-  }
-
-  .column( @width ){
-    display: block;
-    float: left;
-    width: @width;
-
-    @media screen and ( max-width: @breakpoint-mobile ){
-      & {
-        width: 100%;
-      }
-    }
-  }
-}
-
-#sections {
-  .dark(){
-    background-color: @gray-dark;
-    color: @white;
-
-    & a, & h1, & h2, & h3, & h4, & h5, & p {
-      color: @white;
-    }
-  }
-
-  .darker(){
-    background-color: @gray-darker;
-    color: #3E3E3E;
-
-    & h1, & h2, & h3, & h4, & h5 {
-      color: @brand-primary;
-    }
-  }
-
-  .brand-primary(){
-    background-color: @brand-primary;
-    color: @white;
-
-    & a, & h1, & h2, & h3, & h4, & h5, & p {
-      color: @white;
-    }
-  }
-
-  .brand-secondary(){
-    background-color: @brand-secondary;
-    color: @white;
-
-    & a {
-      color: @brand-primary;
-    }
-
-    & h1, & h2, & h3, & h4, & h5, & p {
-      color: @white;
-    }
+    height: 100%;
+    background-size: cover;
+    background-position-y: -100%;
+    -webkit-filter: blur( @panel-frostiness );
   }
 }
 
@@ -126,24 +76,4 @@
   -ms-transition-property: -ms-transform;
   -o-transition-property: -o-transform;
   transition-property: transform;
-}
-
-.btn-color( @color ){
-  border-color: @color;
-  color: @color;
-  &:hover {
-    background-color: rgba( 255, 255, 255, 0.07 );
-  }
-}
-
-.brand-btn( @bg, @color, @alpha: 0.5 ){
-  background-color: @bg;
-  color: @color;
-  &:hover {
-    background-color: lighten( @bg, 2% );
-  }
-
-  border-color: rgba(
-    red(@color), green(@color), blue(@color), @alpha
-  );
 }
