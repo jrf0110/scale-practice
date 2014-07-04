@@ -11,8 +11,10 @@ module.exports = function( grunt ){
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-browserify');
 
+  var pkg = require('./package.json');
+
   var config = {
-    pkg: grunt.file.readJSON('package.json')
+    pkg: pkg
 
   , watch: {
       jshint: {
@@ -26,12 +28,6 @@ module.exports = function( grunt ){
         files: [ 'less/*.less', 'less/**/*.less' ]
       , tasks: ['less']
       , options: { spawn: false }
-      }
-
-    , browserify: {
-        files: [],
-        tasks: ['browserify'],
-        options: { spawn: false }
       }
     }
 
@@ -65,34 +61,19 @@ module.exports = function( grunt ){
         }
       }
     }
-
-  , browserify: {
-      dist: {
-        files: {
-          'dist/app.js': ['js/app.js'],
-        }
-      , options: {  
-          bundleOptions: {
-            debug: true
-          }
-        , transform: ['requireify']
-        , require: ['./js/app.js']
-        }
-      }
-    }
   };
 
   config.watch.jshint.files = config.watch.jshint.files.concat(
     config.jshint.all
   );
 
-  config.watch.browserify.files = config.watch.jshint.files;
+  // config.watch.browserify.files = config.watch.jshint.files;
 
   grunt.initConfig( config );
 
   grunt.registerTask( 'default', [
     'jshint'
-  , 'browserify'
+  // , 'browserify'
   , 'less'
   , 'connect'
   , 'watch'
@@ -100,7 +81,7 @@ module.exports = function( grunt ){
 
   grunt.registerTask( 'build', [
     'jshint'
-  , 'browserify'
+  // , 'browserify'
   , 'less'
   ]);
 };

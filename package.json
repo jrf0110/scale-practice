@@ -4,7 +4,8 @@
   "description": "My scale practice app",
   "main": "Gruntfile.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install": "napa"
   },
   "author": "John Fawcett",
   "license": "BSD-2-Clause",
@@ -13,10 +14,23 @@
     "browserify": "^4.1.9",
     "jquery": "^2.1.1",
     "lodash": "^2.4.1",
-    "sugar": "^1.4.1",
     "grunt-browserify": "~2.1.2"
+    "napa": "^0.4.1",
+    "sugar": "^1.4.1"
+  },
+  "napa": {
+    "selectric": "lcdsantos/jQuery-Selectric#1.7.0"
+  },
+  "browserify": {
+    "transform": [
+      "browserify-shim"
+    , "requireify"
+    ]
+  },
+  "browserify-shim": {
   },
   "devDependencies": {
+    "browserify-shim": "^3.6.0",
     "grunt": "~0.4.1",
     "grunt-browserify": "^2.1.0",
     "grunt-contrib-concat": "~0.3.0",
