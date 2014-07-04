@@ -138,6 +138,8 @@ module.exports = function( $this, options ){
           ].join('') ]( !!e.target.checked, e );
         });
       });
+
+      $this.find('select').selectric();
     }
   };
 

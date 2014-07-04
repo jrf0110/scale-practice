@@ -1,11 +1,13 @@
 require('sugar');
 
-var $         = require('jquery');
+var $         = window.$ = window.jQuery = require('jquery');
 var syn       = require('./lib/syn');
 var ePlayer   = require('./lib/exercise-player').create();
 var exercises = require('./exercises');
 var config    = require('./config');
 var state     = require('./app-state');
+
+require('./lib/jquery-plugins');
 
 // Load jQuery plugin views
 var Views = {

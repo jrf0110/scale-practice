@@ -6,9 +6,16 @@
   position: fixed;
   width: 100%;
   top: 0;
+  padding: 12px;
   .frosty-panel();
+  .frosty-panel-top();
   .standard-padding();
+  .form-group();
 
   // So the blurred bg does not go on top
-  * { position: relative; }
+  & > * { position: relative; }
+}
+
+.app-settings {
+  .form-group();
 }
