@@ -39,6 +39,14 @@ $(function(){
   , onStop: function(){
       ePlayer.stop();
     }
+
+  , onSelectOpen: function(){
+      $('.body').addClass('out-of-focus');
+    }
+
+  , onSelectClose: function(){
+      $('.body').removeClass('out-of-focus');
+    }
   });
 
   views.instrument = Views.instrument( '.instrument', {

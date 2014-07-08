@@ -1,46 +1,3 @@
-// {
-//   onKeyChange: function( key ){
-//     if ( key === 'E' ){
-//       return alert('Sorry, the key of `E` is broken right now lol');
-//     }
-//     appState.key = key;
-//   }
-
-// , onTempoChange: function( tempo ){
-//     appState.tempo = tempo;
-//     metronome.setTempo( tempo );
-//   }
-
-// , onExerciseChange: function( exercise ){
-//     appState.exercise = exercise;
-//   }
-
-// , onRepeatChange: function( repeat ){
-//     appState.repeat = repeat;
-//   }
-
-// , onReverseChange: function( reverse ){
-//     appState.reverse = reverse;
-//   }
-
-// , onPlay: function( e ){
-//     exercise.play(
-//       config.settings.exercises.find( function( e ){
-//         return e.id === appState.exercise;
-//       })
-//     , appState.key
-//     , appState.tempo
-//     , function(){
-//         e.target.innerHTML = 'Play';
-//       }
-//     );
-//   }
-
-// , onStop: function(){
-//     exercise.stop();
-//   }
-// }
-
 var $         = require('jquery');
 var appState  = require('../app-state');
 var exercises = require('../exercises');
@@ -75,6 +32,8 @@ module.exports = function( $this, options ){
   , onReverseChange:    function( reverse, e ){}
   , onPlay:             function( e ){}
   , onStop:             function( e ){}
+  , onSelectOpen:       function( e ){}
+  , onSelectClose:      function( e ){}
   };
 
   options = $.extend( {}, defaults, options );
@@ -139,7 +98,10 @@ module.exports = function( $this, options ){
         });
       });
 
-      $this.find('select').selectric();
+      $this.find('select').selectric({
+        onOpen:   options.onSelectOpen
+      , onClose:  options.onSelectClose
+      });
     }
   };
 

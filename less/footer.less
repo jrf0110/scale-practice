@@ -10,7 +10,7 @@
   .standard-padding();
 
   // So the blurred bg does not go on top
-  * { position: relative; }
+  & > * { position: relative; z-index: 2; }
 }
 
 .footer .logo {
