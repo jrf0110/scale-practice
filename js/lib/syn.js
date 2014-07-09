@@ -152,6 +152,8 @@ var player = {
   }
 };
 
+AudioContext.prototype.createGainNode = AudioContext.prototype.createGainNode || AudioContext.prototype.createGain; 
+
 var context = new AudioContext();
 
 var synthesizer = {
