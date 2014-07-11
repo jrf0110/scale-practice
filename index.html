@@ -8,14 +8,20 @@
   <body>
     <header class="header">
       <div class="app-settings">
+        <label>Key:</label>
         <select name="key" class="setting-control setting-control-key"></select>
+        <label>Exercise:</label>
         <select name="exercise" class="setting-control"></select>
+        <label>Tempo:</label>
         <input  name="tempo" type="number">
-        <button name="play">Play</button>
-        <input  name="reverse" type="checkbox" id="checkbox-reverse">
         <label for="checkbox-reverse">Reverse</label>
-        <input  name="repeat" type="checkbox" id="checkbox-repeat">
+        <input  name="reverse" type="checkbox" id="checkbox-reverse">
         <label for="checkbox-repeat">Repeat</label>
+        <input  name="repeat" type="checkbox" id="checkbox-repeat">
+        
+        <div class="action-wrapper">
+          <button name="play">Play</button>
+        </div>
       </div>
     </header>
     <div class="body">
