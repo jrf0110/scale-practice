@@ -8,3 +8,4 @@ css/*.gen.css
 build/
 nginx
 dist/
+scale-practice.nw

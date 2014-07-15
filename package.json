@@ -2,7 +2,12 @@
   "name": "scale-practice",
   "version": "0.0.1",
   "description": "My scale practice app",
-  "main": "Gruntfile.js",
+  "main": "index.html",
+  "window": {
+    "frame": false,
+    "width": 1200,
+    "height": 530
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "install": "napa"
