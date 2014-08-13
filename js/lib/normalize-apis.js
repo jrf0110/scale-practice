@@ -1,15 +1,15 @@
 window.AudioContext = [
-  'webkit'
+  ''
+, 'webkit'
 , 'moz'
-, ''
 ].firstMap( function( prefix ){
   return window[ prefix + 'AudioContext' ];
 });
 
 window.RequestAnimationFrame = [
-  'webkit'
+  ''
+, 'webkit'
 , 'moz'
-, ''
 ].firstMap( function( prefix ){
   return window[ prefix + 'RequestAnimationFrame' ];
 }) || setTimeout.defaults( null, 1 );
