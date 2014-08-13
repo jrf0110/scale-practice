@@ -107,7 +107,7 @@ var player = {
     this.oscillators = this.frequencies.map( function( f ){
       var osc = options.context.createOscillator();
       var shaper = createGuitarWaveShaper( context, f );
-      var delay = options.context.createDelayNode();
+      var delay = options.context.createDelay();
 
       delay.delayTime.value = 0.03;
 
