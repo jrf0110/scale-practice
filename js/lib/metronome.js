@@ -9,6 +9,7 @@ module.exports = Object.create({
     this.synth.play({
       id: 'C'
     , octave: 4
+    , duration: this.duration()
     }).stop(0.05);
   }
 
@@ -16,7 +17,7 @@ module.exports = Object.create({
     callback = callback || function(){};
 
     var this_ = this;
-    var duration = ( 1 / (state.tempo / 60) ) * 1000;
+    var duration = this.duration();
 
     async.series(
       Number.range( 0, 3 ).every().map( function(){
@@ -37,5 +38,9 @@ module.exports = Object.create({
 
 , stop: function(){
     clearInterval( this.tickInterval );
+  }
+
+, duration: function(){
+    return ( 1 / (state.tempo / 60) ) * 1000;
   }
 });

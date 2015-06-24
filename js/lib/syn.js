@@ -193,15 +193,12 @@ var synthesizer = {
     if ( !Array.isArray( notes ) ){
       notes = [ notes ];
     }
+    
+    // Pretty shady, but pick one duration
+    var duration = notes[0].duration;
 
-    var duration;
     var frequencies = notes.map( function( note ){
-      // Pretty shady, but pick one duration
-      duration = note.duration;
-
-      return Object.merge( this_.noteFrequencyTable[ note.id + note.octave ], {
-        duration: note.duration
-      });
+      return this_.noteFrequencyTable[ note.id + note.octave ]
     });
 
     this.gainNode.gain.cancelScheduledValues( now );
@@ -214,6 +211,7 @@ var synthesizer = {
       frequencies:  frequencies
     , context:      this.context
     , destination:  this.gainNode
+    , duration:     duration
     }).play( delay );
 
     if ( duration ){

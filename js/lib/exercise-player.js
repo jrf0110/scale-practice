@@ -51,7 +51,7 @@ var proto = {
         }];
 
         var notes = notesFrets.map( function( f ){
-          return Object.merge( guitarNoteMap[ f.string ][ f.fret ], {
+          return utils.extend( {}, guitarNoteMap[ f.string ][ f.fret ], {
             duration: durationSec
           });
         });
