@@ -9,6 +9,7 @@
     "height": 530
   },
   "scripts": {
+    "build": "browserify -e js/app.js > dist/app.js && grunt build",
     "test": "echo \"Error: no test specified\" && exit 1",
     "install": "napa"
   },
